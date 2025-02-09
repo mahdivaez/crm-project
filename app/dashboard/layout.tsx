@@ -12,9 +12,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
+import { redirect } from "next/navigation"
+import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components"
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const {getUser} = getKindeServerSession()
+  const user = await getUser()
+
+  if(!user || user.email !== "mahdivaeztehrani81@gmail.com"){
+    redirect("/")
+  }
+
   return (
+
     <div className="flex flex-col h-screen bg-gray-50">
       {/* Top Navigation Bar */}
       <header className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
@@ -37,9 +48,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">User Name</p>
+                      <p className="text-sm font-medium leading-none">{user.given_name || "User"}</p>
                       <p className="text-xs leading-none text-muted-foreground">
-                        user@example.com
+                        {user.email}
                       </p>
                     </div>
                   </DropdownMenuLabel>
@@ -51,8 +62,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     Settings
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    Log out
+                  <DropdownMenuItem asChild>
+                    <LogoutLink>Log out</LogoutLink>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
